@@ -4,9 +4,9 @@ import globalContext from '../context/global/globalContext';
 
 function Home() {
   const gcontext = useContext(globalContext);
-  const { isCustomerLoggedIn, isAgentLoggedIn } = gcontext;
+  const { isCustomerLoggedIn, isAdminLoggedIn } = gcontext;
   return (
-    <div className="text-center">
+    <div className="text-center py-8">
       <h1 className="text-3xl sm:text-4xl font-bold mb-4">
         Welcome to Courier Management System
       </h1>
@@ -19,10 +19,10 @@ function Home() {
           Customer Portal
         </Link>
         <Link
-          to={isAgentLoggedIn ? '/admin' : '/admin/login'}
+          to={isAdminLoggedIn ? '/company' : '/company/login'}
           className="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded transition duration-300"
         >
-          Admin Portal
+          Company Portal
         </Link>
         <Link
           to="/track"

@@ -1,24 +1,30 @@
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import './App.css';
 import './output.css';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import Home from './components/Home';
 import CustomerPortal from './components/CustomerPortal';
-import AdminPortal from './components/AdminPortal';
+import CompanyPortal from './components/CompanyPortal';
 import TrackingPortal from './components/TrackingPortal';
 import Spinner from './components/Spinner';
 import CustomerLogin from './components/CustomerLogin';
 import CustomerSignUp from './components/CustomerSignUp';
-import AdminLogin from './components/AdminLogin';
+import CustomerAccount from './components/CustomerAccount';
+import CompanyLogin from './components/CompanyLogin';
+import CompanySignUp from './components/CompanySignUp';
+import CompanyAccount from './components/CompanyAccount';
+import globalContext from './context/global/globalContext';
 
+import { PackageState } from './context/packages/packageContext';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
 // Main App Component
 export default function App() {
   const [requests, setRequests] = useState([]);
-
+  const gcontext = useContext(globalContext);
+  const { isSticky, isMenuOpen } = gcontext;
   return (
     <Router>
       <Spinner />
@@ -35,40 +41,59 @@ export default function App() {
         theme="light"
       />
       <div className="min-h-screen bg-gray-100 font-poppins">
-        <header className="bg-white shadow-md">
+        <header
+          className={`bg-white ${
+            isSticky || isMenuOpen
+              ? 'sticky top-0 transition-transform transform translate-y-0'
+              : 'transition-transform transform -translate-y-full'
+          }`}
+        >
           {/* Navbar */}
           <Navbar />
         </header>
 
-        <main className="container  mx-auto px-4 py-8">
+        <main className="container  mx-auto px-4  ">
           <Routes>
             <Route
               path="/customer"
-              element={<CustomerPortal setRequests={setRequests} />}
+              element={
+                <PackageState>
+                  <CustomerPortal
+                    requests={requests}
+                    setRequests={setRequests}
+                  />
+                </PackageState>
+              }
             />
             <Route
-              path="/admin"
+              path="/company"
               element={
-                <AdminPortal requests={requests} setRequests={setRequests} />
+                <CompanyPortal requests={requests} setRequests={setRequests} />
               }
             />
             <Route
               path="/track"
-              element={<TrackingPortal requests={requests} />}
+              element={
+                <PackageState>
+                  <TrackingPortal requests={requests} />
+                </PackageState>
+              }
             />
             <Route path="/" element={<Home />} />
             <Route path="/customer/login" element={<CustomerLogin />} />
             <Route path="/customer/signup" element={<CustomerSignUp />} />
-            <Route path="/admin/login" element={<AdminLogin />} />
+            <Route path="/customer/account" element={<CustomerAccount />} />
+            <Route path="/company/login" element={<CompanyLogin />} />
+            <Route path="/company/signup" element={<CompanySignUp />} />
+            <Route path="/company/account" element={<CompanyAccount />} />
           </Routes>
         </main>
-
-        <footer className="bg-gray-800 text-white py-4 fixed bottom-0 w-full">
-          <div className="container mx-auto px-4 text-center">
-            <p>&copy; 2024 ParcelPro. All rights reserved.</p>
-          </div>
-        </footer>
       </div>
+      <footer className="bg-gray-800 text-white py-4 w-full">
+        <div className="container mx-auto px-4 text-center">
+          <p>&copy; 2024 ParcelPro. All rights reserved.</p>
+        </div>
+      </footer>
     </Router>
   );
 }

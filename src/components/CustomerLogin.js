@@ -1,45 +1,51 @@
 import React, { useContext, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import globalContext from '../context/global/globalContext';
 import { Eye, EyeOff } from 'lucide-react';
-import { Link } from 'react-router-dom';
 
 function CustomerLogin() {
   document.title = 'ParcelPro | Customer Login';
   const gcontext = useContext(globalContext);
-  const { showAlert, setSpinner } = gcontext;
+  const { notify, setSpinner, isCustomerLoggedIn, setCustomer } = gcontext;
   const [credentials, setCredentials] = useState({ email: '', password: '' });
   const [showPassword, setShowPassword] = useState(false);
   let navigate = useNavigate();
-  const host = process.env.REACT_APP_MYNOTEBOOK_HOST;
+  const host = process.env.REACT_APP_PARCELPRO_HOST;
 
+  if (isCustomerLoggedIn) {
+    navigate('/customer');
+  }
   const handleSubmit = async e => {
     e.preventDefault();
     const { email, password } = credentials;
     setSpinner(true);
-    console.log(email, password);
-    // const response = await fetch(`${host}/api/auth/login`, {
-    //   method: 'POST',
-    //   headers: {
-    //     'Content-Type': 'application/json',
-    //   },
-    //   body: JSON.stringify({
-    //     email,
-    //     password,
-    //   }),
-    // });
-    // setSpinner(false);
+    // console.log(email, password);
+    const response = await fetch(`${host}/api/auth/customerlogin`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        email,
+        password,
+      }),
+    });
+    setSpinner(false);
 
-    // const json = await response.json();
-    // if (json.success) {
-    //   localStorage.setItem('token', json.authToken);
-    //   localStorage.setItem('name', json.name);
-    //   localStorage.setItem('email', json.email);
-    //   showAlert('Logged In Successfully', 'success');
-    //   navigate('/content');
-    // } else {
-    //   showAlert('Invalid credentials', 'danger');
-    // }
+    const json = await response.json();
+    if (json.success) {
+      const data = {
+        name: json.name,
+        email: json.email,
+        token: json.authToken,
+      };
+      localStorage.setItem('Customer', JSON.stringify(data));
+      setCustomer(data);
+      notify('Logged In Successfully', 'success');
+      navigate('/customer');
+    } else {
+      notify('Invalid credentials', 'error');
+    }
   };
 
   const onChange = e => {

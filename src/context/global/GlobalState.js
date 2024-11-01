@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import GlobalContext from './globalContext';
 
 import { toast } from 'react-toastify';
@@ -40,18 +40,79 @@ const GlobalState = props => {
   };
 
   const [isCustomerLoggedIn, setIsCustomerLoggedIn] = useState(false);
-  const [isAgentLoggedIn, setIsAgentLoggedIn] = useState(false);
+  const [isMemberLoggedIn, setisMemberLoggedIn] = useState(false);
+
+  const [customer, setCustomer] = useState({});
+  const [member, setMember] = useState({});
+
+  useEffect(() => {
+    const customer = JSON.parse(localStorage.getItem('Customer'));
+    const member = JSON.parse(localStorage.getItem('Member'));
+    console.log(customer, member);
+    if (customer) {
+      setIsCustomerLoggedIn(true);
+      setCustomer(customer);
+    }
+    if (member) {
+      setisMemberLoggedIn(true);
+      setMember(member);
+    }
+  }, []);
+
+  const customerLogout = () => {
+    localStorage.removeItem('Customer');
+    setIsCustomerLoggedIn(false);
+    setCustomer({});
+  };
+
+  const memberLogout = () => {
+    localStorage.removeItem('Member');
+    setisMemberLoggedIn(false);
+    setMember({});
+  };
+
+  const [isSticky, setIsSticky] = useState(true);
+  const [lastScrollY, setLastScrollY] = useState(0);
+
+  const handleScroll = () => {
+    if (window.scrollY < lastScrollY) {
+      setIsSticky(true);
+    } else {
+      setIsSticky(false);
+    }
+    setLastScrollY(window.scrollY);
+  };
+
+  useEffect(() => {
+    window.addEventListener('scroll', handleScroll);
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+    };
+    // eslint-disable-next-line
+  }, [lastScrollY]);
+
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+
   return (
     <GlobalContext.Provider
       value={{
+        isMenuOpen,
+        setIsMenuOpen,
+        isSticky,
+        customer,
+        setCustomer,
+        member,
+        setMember,
         isPhone,
         isCustomerLoggedIn,
-        isAgentLoggedIn,
-        setIsAgentLoggedIn,
+        isMemberLoggedIn,
+        setisMemberLoggedIn,
         setIsCustomerLoggedIn,
         spinner,
         setSpinner,
         notify,
+        customerLogout,
+        memberLogout,
       }}
     >
       {props.children}

@@ -1,119 +1,315 @@
-import React, { useState } from 'react';
-import { Package, Truck, CheckCircle, Search } from 'lucide-react';
+import React, { useState, useContext, useEffect } from 'react';
+import { packageContext } from '../context/packages/packageContext';
+import globalContext from '../context/global/globalContext';
+import { useSearchParams, useNavigate } from 'react-router-dom';
+import StatusBadge from './StatusBadge';
+import { Search, Link } from 'lucide-react';
 
-function TrackingPortal({ requests }) {
+function TrackingPortal() {
   const [trackingId, setTrackingId] = useState('');
-  const [trackingInfo, setTrackingInfo] = useState(null);
+  const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
+  const trackID = searchParams.get('trackid');
+  useEffect(() => {
+    if (trackID) {
+      setTrackingId(trackID);
+      track(trackID);
+    }
+  }, [trackID]);
 
+  const gcontext = useContext(globalContext);
+  const { notify } = gcontext;
+  const pContext = useContext(packageContext);
+  const { track, packageDetails, trackpage } = pContext;
   const handleSubmit = e => {
     e.preventDefault();
-    const foundPackage = requests.find(req => req.trackingId === trackingId);
-    if (foundPackage) {
-      setTrackingInfo(foundPackage);
-    } else {
-      alert('Package not found.   Please check your tracking ID.');
-      setTrackingInfo(null);
+    track(trackingId);
+    navigate('/track');
+  };
+
+  const copyTrackingLinkToClipboard = async trackID => {
+    const hostAddress = window.location.host;
+    const trackingLink = `${hostAddress}/track?trackid=${trackID}`;
+
+    try {
+      await navigator.clipboard.writeText(trackingLink);
+      notify('Tracking link copied to clipboard', 'success');
+    } catch (err) {
+      console.error('Failed to copy: ', err);
     }
   };
 
   return (
-    <div className="max-w-2xl mx-auto">
-      <h1 className="text-2xl sm:text-3xl font-bold mb-6 text-center">
-        Track Your Package
-      </h1>
-      <form onSubmit={handleSubmit} className="mb-8">
-        <div className="flex flex-col sm:flex-row">
-          <input
-            type="text"
-            placeholder="Enter Tracking ID"
-            value={trackingId}
-            onChange={e => setTrackingId(e.target.value)}
-            className="flex-grow shadow appearance-none border rounded-l w-full sm:w-auto py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline mb-2 sm:mb-0"
-            required
-          />
-          <button
-            type="submit"
-            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-r focus:outline-none focus:shadow-outline flex items-center justify-center"
-          >
-            <Search className="mr-2" size={20} />
-            Track
-          </button>
-        </div>
-      </form>
-
-      {trackingInfo && (
-        <div className="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4">
-          <h2 className="text-xl font-semibold mb-4">Tracking Information</h2>
-          <div className="mb-4">
-            <p className="text-gray-700">
-              <strong>Tracking ID:</strong> {trackingInfo.trackingId}
-            </p>
-            <p className="text-gray-700">
-              <strong>Status:</strong>
-              <span
-                className={`ml-2 inline-block px-2 py-1 text-sm font-semibold rounded-full ${
-                  trackingInfo.status === 'Delivered'
-                    ? 'bg-green-200 text-green-800'
-                    : trackingInfo.status === 'In Transit'
-                    ? 'bg-blue-200 text-blue-800'
-                    : 'bg-yellow-200 text-yellow-800'
-                }`}
-              >
-                {trackingInfo.status === 'Delivered' && (
-                  <CheckCircle className="inline-block mr-1" size={16} />
-                )}
-                {trackingInfo.status === 'In Transit' && (
-                  <Truck className="inline-block mr-1" size={16} />
-                )}
-                {trackingInfo.status === 'Pending' && (
-                  <Package className="inline-block mr-1" size={16} />
-                )}
-                {trackingInfo.status}
-              </span>
-            </p>
-            <p className="text-gray-700">
-              <strong>From:</strong> {trackingInfo.pickupAddress}
-            </p>
-            <p className="text-gray-700">
-              <strong>To:</strong> {trackingInfo.deliveryAddress}
-            </p>
-            <p className="text-gray-700">
-              <strong>Package Details:</strong> {trackingInfo.packageDetails}
-            </p>
-            <p className="text-gray-700">
-              <strong>Last Updated:</strong>{' '}
-              {new Date(trackingInfo.createdAt).toLocaleString()}
-            </p>
+    <>
+      <div className="max-w-2xl mx-auto py-8">
+        <h1 className="text-2xl sm:text-3xl font-bold mb-4 text-center">
+          Track Your Package
+        </h1>
+        <form onSubmit={handleSubmit} className="mb-2 rounded-lg">
+          <div className="flex flex-row">
+            <input
+              type="text"
+              placeholder="Enter Tracking ID"
+              value={trackingId}
+              onChange={e => setTrackingId(e.target.value)}
+              className="flex-grow shadow appearance-none border rounded-l-lg w-full sm:w-auto py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+              required
+            />
+            <button
+              type="submit"
+              className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-r-lg focus:outline-none focus:shadow-outline flex items-center justify-center"
+            >
+              <Search className="mr-2" size={20} />
+              Track
+            </button>
           </div>
-          <div className="relative pt-1">
-            <div className="flex mb-2 items-center justify-between">
-              <div className="text-right">
-                <span className="text-xs font-semibold inline-block text-blue-600">
-                  {trackingInfo.status === 'Delivered'
-                    ? '100%'
-                    : trackingInfo.status === 'In Transit'
-                    ? '66%'
-                    : '33%'}
-                </span>
-              </div>
+        </form>
+      </div>
+      {trackpage && (
+        <div className="flex items-center justify-center">
+          <div className=" bg-white rounded-lg shadow-lg p-6 z-10 max-w-4xl w-full sm:mx-6 md:mx-8 lg:mx-10 xl:mx-12 overflow-y-auto max-h-full text-sm">
+            <div className="flex justify-between items-center mb-2">
+              <h2 className="text-xl font-bold">Package Details</h2>
+              <StatusBadge status={packageDetails.status} />
             </div>
-            <div className="overflow-hidden h-2 mb-4 text-xs flex rounded bg-blue-200">
-              <div
-                style={{
-                  width:
-                    trackingInfo.status === 'Delivered'
-                      ? '100%'
-                      : trackingInfo.status === 'In Transit'
-                      ? '66%'
-                      : '33%',
+            <div className="flex  items-center mb-2">
+              <p className="font-semibold">
+                <strong>Track ID:</strong> {packageDetails.trackID}
+              </p>
+              <Link
+                onClick={() => {
+                  copyTrackingLinkToClipboard(packageDetails.trackID);
                 }}
-                className="shadow-none flex flex-col text-center whitespace-nowrap text-white justify-center bg-blue-500"
-              ></div>
+                className="size-6 mx-2 bg-gray-100 rounded-md p-1 transition duration-300 ease-in-out transform hover:bg-gray-300 hover:scale-105 cursor-pointer"
+              />
+            </div>
+            <hr />
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-2">
+              <div className="mb-4">
+                <h3 className="text-xl font-semibold">Sender</h3>
+                <p>
+                  <strong>Name:</strong> {packageDetails.sender?.name}
+                </p>
+                <p>
+                  <strong>Email:</strong> {packageDetails.sender?.email}
+                </p>
+                <p>
+                  <strong>Contact:</strong> {packageDetails.sender?.contact}
+                </p>
+                <p>
+                  <strong>State:</strong> {packageDetails.sender?.state}
+                </p>
+                <p>
+                  <strong>City/Vilage:</strong> {packageDetails.sender?.cityVil}
+                </p>
+                <p>
+                  <strong>Pincode:</strong> {packageDetails.sender?.pincode}
+                </p>
+                <p>
+                  <strong>Address:</strong> {packageDetails.sender?.address}
+                </p>
+              </div>
+              <div className="mb-4">
+                <h3 className="text-xl font-semibold">Receiver</h3>
+                <p>
+                  <strong>Name:</strong> {packageDetails.receiver?.name}
+                </p>
+                <p>
+                  <strong>Email:</strong> {packageDetails.receiver?.email}
+                </p>
+                <p>
+                  <strong>Contact:</strong> {packageDetails.receiver?.contact}
+                </p>
+                <p>
+                  <strong>State:</strong> {packageDetails.receiver?.state}
+                </p>
+                <p>
+                  <strong>City/Vilage:</strong>{' '}
+                  {packageDetails.receiver?.cityVil}
+                </p>
+                <p>
+                  <strong>Pincode:</strong> {packageDetails.receiver?.pincode}
+                </p>
+                <p>
+                  <strong>Address:</strong> {packageDetails.receiver?.address}
+                </p>
+              </div>
+              <div className="mb-4">
+                <h3 className="text-xl font-semibold">Package</h3>
+                <p>
+                  <strong>Type:</strong> {packageDetails.package?.packageType}
+                </p>
+                <p>
+                  <strong>Service:</strong>{' '}
+                  {packageDetails.package?.serviceType}
+                </p>
+                <p>
+                  <strong>Package Description:</strong>{' '}
+                  {packageDetails.package?.packageDesc}
+                </p>
+                <p>
+                  <strong>Distance:</strong> {packageDetails.package?.distance}{' '}
+                  km
+                </p>
+                <p>
+                  <strong>Weight:</strong> {packageDetails.package?.weight} kg
+                </p>
+                <p>
+                  <strong>Size:</strong> {packageDetails.package?.size.length} x{' '}
+                  {packageDetails.package?.size.breadth} x{' '}
+                  {packageDetails.package?.size.height} cm
+                </p>
+              </div>
+              <div className="mb-4">
+                <h3 className="text-xl font-semibold">Cost Structure</h3>
+                <p>
+                  <strong>Base Cost:</strong> ₹
+                  {packageDetails.costStructure?.baseCost}
+                </p>
+                <p>
+                  <strong>Service Cost:</strong> ₹
+                  {packageDetails.costStructure?.serviceCost}
+                </p>
+                <p>
+                  <strong>Cost:</strong> ₹{packageDetails.costStructure?.cost}
+                </p>
+                <p>
+                  <strong>Tax:</strong> ₹{packageDetails.costStructure?.tax}
+                </p>
+                <p>
+                  <strong>Total Cost:</strong> ₹
+                  {packageDetails.costStructure?.totalCost}
+                </p>
+              </div>
+              {packageDetails.transit && (
+                <div className="mb-4">
+                  <h3 className="text-xl font-semibold mb-2">Transit Status</h3>
+                  <p>
+                    <strong>Driver:</strong>{' '}
+                    {packageDetails.transit?.driverName}
+                  </p>
+                  <p>
+                    <strong>Reached Destination:</strong>{' '}
+                    {packageDetails.transit?.reachedDest ? 'Yes' : 'No'}
+                  </p>
+                  <div className="max-h-48 overflow-y-auto">
+                    <p className="px-2 font-semibold bg-blue-300 shadow-md rounded-lg border border-gray-300 mb-2">
+                      End
+                    </p>
+                    {packageDetails.transit?.status
+                      .slice()
+                      .reverse()
+                      .map((status, index) => (
+                        <div
+                          key={status._id}
+                          className="p-2  shadow-md rounded-lg border border-gray-300 mb-2"
+                        >
+                          <div className="grid grid-cols-2 gap-2 mb-2">
+                            <p className=" font-semibold">{status.location}</p>
+                            <p className="text-gray-500 text-sm text-right">
+                              {new Intl.DateTimeFormat('en-GB', {
+                                day: '2-digit',
+                                month: '2-digit',
+                                year: 'numeric',
+                              }).format(new Date(status.date))}
+                              , {new Date(status.date).toLocaleTimeString()}
+                            </p>
+                          </div>
+                          <p className="text-gray-600">{status.description}</p>
+                        </div>
+                      ))}
+                    <p className="px-2 font-semibold bg-blue-300 shadow-md rounded-lg border border-gray-300 mb-2">
+                      Start
+                    </p>
+                  </div>
+                </div>
+              )}
+              {packageDetails.delivery && (
+                <div className="mb-4 ">
+                  <h3 className="text-xl font-semibold">Delivery Details</h3>
+                  <p>
+                    <strong>Delivered:</strong>{' '}
+                    {packageDetails.delivery?.delivered ? 'Yes' : 'No'}
+                  </p>
+                  <p>
+                    <strong>Delivery Partner:</strong>{' '}
+                    {packageDetails.delivery?.deliveryPartnerName}
+                  </p>
+                  <p>
+                    <strong>Date:</strong>{' '}
+                    {new Intl.DateTimeFormat('en-GB', {
+                      day: '2-digit',
+                      month: '2-digit',
+                      year: 'numeric',
+                    }).format(new Date(packageDetails.delivery?.date))}
+                    ,{' '}
+                    {new Date(
+                      packageDetails.delivery?.date
+                    ).toLocaleTimeString()}
+                  </p>
+                  {!packageDetails.delivery?.delivered && (
+                    <>
+                      <h3 className="text-xl font-semibold mt-4">
+                        Failed Delivery
+                      </h3>
+                      <p>
+                        <strong>Delivery Failed:</strong>{' '}
+                        {packageDetails.delivery?.failed.deliveryFailed
+                          ? 'Yes'
+                          : 'No'}
+                      </p>
+                      <p>
+                        <strong>Action:</strong>{' '}
+                        {packageDetails.delivery?.failed.deliveryFailAction}
+                      </p>
+                      <p>
+                        <strong>Description:</strong>{' '}
+                        {packageDetails.delivery?.failed.description}
+                      </p>
+                    </>
+                  )}
+                </div>
+              )}
+              <div className="mb-4 md:col-span-2">
+                <p>
+                  <strong>Date:</strong>{' '}
+                  {packageDetails.date ? (
+                    <>
+                      {new Intl.DateTimeFormat('en-GB', {
+                        day: '2-digit',
+                        month: '2-digit',
+                        year: 'numeric',
+                      }).format(new Date(packageDetails.date))}
+                      , {new Date(packageDetails.date).toLocaleTimeString()}
+                    </>
+                  ) : (
+                    'N/A'
+                  )}
+                </p>
+                <p>
+                  <strong>Last Updated:</strong>{' '}
+                  {packageDetails.lastUpdated ? (
+                    <>
+                      {new Intl.DateTimeFormat('en-GB', {
+                        day: '2-digit',
+                        month: '2-digit',
+                        year: 'numeric',
+                      }).format(new Date(packageDetails.lastUpdated))}
+                      ,{' '}
+                      {new Date(
+                        packageDetails.lastUpdated
+                      ).toLocaleTimeString()}
+                    </>
+                  ) : (
+                    'N/A'
+                  )}
+                </p>
+              </div>
             </div>
           </div>
         </div>
       )}
-    </div>
+    </>
   );
 }
 

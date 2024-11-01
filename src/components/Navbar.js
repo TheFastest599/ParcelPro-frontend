@@ -1,19 +1,19 @@
-import React, { useContext, useState } from 'react';
+import React, { useContext } from 'react';
 import { Link } from 'react-router-dom';
 import { Package, Menu, X } from 'lucide-react';
 import globalContext from '../context/global/globalContext';
 
 function Navbar() {
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
   const gcontext = useContext(globalContext);
-  const { isCustomerLoggedIn, isAgentLoggedIn } = gcontext;
+  const { isCustomerLoggedIn, isAdminLoggedIn, isMenuOpen, setIsMenuOpen } =
+    gcontext;
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
   };
   return (
     <nav className="container mx-auto px-4 py-3">
-      <div className="flex justify-between items-center">
+      <div className="flex justify-between items-center sticky top-0">
         <Link
           to="/"
           className="text-gray-800 hover:text-blue-600 transition duration-300 flex items-center"
@@ -29,10 +29,10 @@ function Navbar() {
             Customer
           </Link>
           <Link
-            to={isAgentLoggedIn ? '/admin' : '/admin/login'}
+            to={isAdminLoggedIn ? '/company' : '/company/login'}
             className="text-gray-600 hover:text-blue-600 transition duration-300"
           >
-            Admin
+            Company
           </Link>
           <Link
             to="/track"
@@ -54,10 +54,10 @@ function Navbar() {
             Customer Portal
           </Link>
           <Link
-            to={isAgentLoggedIn ? '/admin' : '/admin/login'}
+            to={isAdminLoggedIn ? '/company' : '/company/login'}
             className="block py-2 text-gray-600 hover:text-blue-600 transition duration-300"
           >
-            Admin Portal
+            Company Portal
           </Link>
           <Link
             to="/track"

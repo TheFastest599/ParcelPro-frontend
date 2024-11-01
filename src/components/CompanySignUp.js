@@ -1,18 +1,28 @@
 import React, { useContext, useState, useEffect } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import globalContext from '../context/global/globalContext';
 import { Eye, EyeOff } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
-function CustomerSignUp() {
-  document.title = 'ParcelPro | Customer Sign Up';
+function CompanySignUp() {
+  document.title = 'ParcelPro | Company Sign Up';
   const gcontext = useContext(globalContext);
-  const { notify, setSpinner, isCustomerLoggedIn, setCustomer } = gcontext;
+  const { notify, setSpinner, isMemberLoggedIn, setMember } = gcontext;
+
+  let navigate = useNavigate();
+
+  useEffect(() => {
+    if (isMemberLoggedIn) {
+      navigate('/company');
+    }
+  }, [isMemberLoggedIn]);
 
   const [credentials, setCredentials] = useState({
     name: '',
     email: '',
     password: '',
     cpassword: '',
+    memberType: 'admin', // Default member type
   });
 
   const [check, setCheck] = useState({
@@ -37,18 +47,18 @@ function CustomerSignUp() {
     /^(?=.*[A-Za-z])(?=.*\d)(?=.*[!@#$%^&*()_+\-={};':"\\|,.<>?])[A-Za-z\d!@#$%^&*()_+\-={};':"\\|,.<>?]{6,}$/;
   const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 
-  let navigate = useNavigate();
-  if (isCustomerLoggedIn) {
-    navigate('/customer');
+  if (isMemberLoggedIn) {
+    navigate('/company');
   }
+
   const host = process.env.REACT_APP_PARCELPRO_HOST;
 
   const handleSubmit = async e => {
-    const { name, email, password } = credentials;
+    const { name, email, password, memberType } = credentials;
     e.preventDefault();
     setSpinner(true);
-    console.log(name, email, password);
-    const response = await fetch(`${host}/api/auth/createcustomer`, {
+    console.log(name, email, password, memberType);
+    const response = await fetch(`${host}/api/auth/createmember`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -57,6 +67,7 @@ function CustomerSignUp() {
         name,
         email,
         password,
+        memberType,
       }),
     });
     setSpinner(false);
@@ -67,15 +78,18 @@ function CustomerSignUp() {
       const data = {
         name: json.name,
         email: json.email,
+        memberType: json.memberType,
+        engaged: json.engaged,
+        packageId: json.packageId,
         token: json.authToken,
       };
-      localStorage.setItem('Customer', JSON.stringify(data));
+      localStorage.setItem('Member', JSON.stringify(data));
       // localStorage.setItem('token', json.authToken);
       // localStorage.setItem('name', json.name);
       // localStorage.setItem('email', json.email);
-      setCustomer(data);
+      setMember(data);
       notify('Account Created Successfully', 'success');
-      navigate('/customer');
+      navigate('/company');
     } else {
       if (json.error) {
         notify(json.error, 'error');
@@ -104,7 +118,7 @@ function CustomerSignUp() {
           <div className="p-5">
             <form className="mb-3" onSubmit={handleSubmit}>
               <div className="text-4xl mb-5 font-semibold text-center">
-                Customer Sign Up
+                Company Sign Up
               </div>
               <div className="mb-3">
                 <label
@@ -155,6 +169,25 @@ function CustomerSignUp() {
                   }}
                   placeholder="name@example.com"
                 />
+              </div>
+              <div className="mb-3">
+                <label
+                  htmlFor="memberType"
+                  className="block text-sm font-medium text-gray-700"
+                >
+                  Member Type
+                </label>
+                <select
+                  name="memberType"
+                  id="memberType"
+                  className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                  value={credentials.memberType}
+                  onChange={onChange}
+                >
+                  <option value="admin">Admin</option>
+                  <option value="driver">Driver</option>
+                  <option value="delivery partner">Delivery Partner</option>
+                </select>
               </div>
               <div className="mb-3">
                 <label
@@ -275,7 +308,7 @@ function CustomerSignUp() {
               <p className="text-center text-sm">
                 Already have an account?&nbsp; &nbsp;|&nbsp; &nbsp;
                 <Link
-                  to="/customer/login"
+                  to="/company/login"
                   className="font-bold text-indigo-600 hover:text-indigo-500"
                 >
                   Login
@@ -289,4 +322,4 @@ function CustomerSignUp() {
   );
 }
 
-export default CustomerSignUp;
+export default CompanySignUp;

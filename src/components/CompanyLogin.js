@@ -1,45 +1,65 @@
-import React, { useContext, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import globalContext from '../context/global/globalContext';
 import { Eye, EyeOff } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
-function AdminLogin() {
-  document.title = 'ParcelPro | Admin Login';
+function CompanyLogin() {
+  document.title = 'ParcelPro | Company Login';
   const gcontext = useContext(globalContext);
-  const { showAlert, setSpinner } = gcontext;
-  const [credentials, setCredentials] = useState({ email: '', password: '' });
-  const [showPassword, setShowPassword] = useState(false);
+  const { notify, setSpinner, isMemberLoggedIn, setMember } = gcontext;
   let navigate = useNavigate();
-  const host = process.env.REACT_APP_MYNOTEBOOK_HOST;
+
+  useEffect(() => {
+    if (isMemberLoggedIn) {
+      navigate('/company');
+    }
+  }, [isMemberLoggedIn]);
+  const [credentials, setCredentials] = useState({
+    email: '',
+    password: '',
+    memberType: 'admin',
+  });
+  const [showPassword, setShowPassword] = useState(false);
+
+  const host = process.env.REACT_APP_PARCELPRO_HOST;
 
   const handleSubmit = async e => {
     e.preventDefault();
-    const { email, password } = credentials;
+    const { email, password, memberType } = credentials;
     setSpinner(true);
-    console.log(email, password);
-    // const response = await fetch(`${host}/api/auth/login`, {
-    //   method: 'POST',
-    //   headers: {
-    //     'Content-Type': 'application/json',
-    //   },
-    //   body: JSON.stringify({
-    //     email,
-    //     password,
-    //   }),
-    // });
-    // setSpinner(false);
+    console.log(email, password, memberType);
+    const response = await fetch(`${host}/api/auth/memberlogin`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        email,
+        password,
+        memberType,
+      }),
+    });
+    setSpinner(false);
 
-    // const json = await response.json();
-    // if (json.success) {
-    //   localStorage.setItem('token', json.authToken);
-    //   localStorage.setItem('name', json.name);
-    //   localStorage.setItem('email', json.email);
-    //   showAlert('Logged In Successfully', 'success');
-    //   navigate('/content');
-    // } else {
-    //   showAlert('Invalid credentials', 'danger');
-    // }
+    const json = await response.json();
+    if (json.success) {
+      const data = {
+        name: json.name,
+        email: json.email,
+        memberType: json.memberType,
+        engaged: json.engaged,
+        packageId: json.packageId,
+        token: json.authToken,
+      };
+      console.log(data);
+      localStorage.setItem('Member', JSON.stringify(data));
+      setMember(data);
+      notify('Logged In Successfully', 'success');
+      navigate('/company');
+    } else {
+      notify(json.error, 'error');
+    }
   };
 
   const onChange = e => {
@@ -57,7 +77,7 @@ function AdminLogin() {
           <div className="px-5 pt-4">
             <form className="mb-3 mt-4" onSubmit={handleSubmit}>
               <div className="text-4xl mb-5 font-semibold text-center">
-                Admin Login
+                Company Login
               </div>
               <div className="mb-3">
                 <label
@@ -103,6 +123,25 @@ function AdminLogin() {
                   )}
                 </span>
               </div>
+              <div className="mb-3">
+                <label
+                  htmlFor="memberType"
+                  className="block text-sm font-medium text-gray-700"
+                >
+                  Member Type
+                </label>
+                <select
+                  name="memberType"
+                  id="memberType"
+                  className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                  value={credentials.memberType}
+                  onChange={onChange}
+                >
+                  <option value="admin">Admin</option>
+                  <option value="driver">Driver</option>
+                  <option value="delivery partner">Delivery Partner</option>
+                </select>
+              </div>
               <div className="text-right py-2">
                 <p className="text-sm">
                   <Link
@@ -124,17 +163,17 @@ function AdminLogin() {
               </div>
             </form>
             <br />
-            {/* <div>
+            <div>
               <p className="text-center text-sm">
                 Don't have an account? &nbsp;&nbsp; | &nbsp;&nbsp;
                 <Link
-                  to="/signup"
+                  to="/company/signup"
                   className="font-bold text-indigo-600 hover:text-indigo-500"
                 >
                   Sign Up
                 </Link>
               </p>
-            </div> */}
+            </div>
           </div>
         </div>
       </div>
@@ -142,4 +181,4 @@ function AdminLogin() {
   );
 }
 
-export default AdminLogin;
+export default CompanyLogin;
