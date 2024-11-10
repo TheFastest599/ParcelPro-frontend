@@ -6,7 +6,8 @@ import { Eye, EyeOff } from 'lucide-react';
 function CustomerSignUp() {
   document.title = 'ParcelPro | Customer Sign Up';
   const gcontext = useContext(globalContext);
-  const { notify, setSpinner, isCustomerLoggedIn, setCustomer } = gcontext;
+  const { notify, setSpinner, isCustomerLoggedIn, setCustomer, host } =
+    gcontext;
 
   const [credentials, setCredentials] = useState({
     name: '',
@@ -41,13 +42,12 @@ function CustomerSignUp() {
   if (isCustomerLoggedIn) {
     navigate('/customer');
   }
-  const host = process.env.REACT_APP_PARCELPRO_HOST;
 
   const handleSubmit = async e => {
     const { name, email, password } = credentials;
     e.preventDefault();
     setSpinner(true);
-    console.log(name, email, password);
+    // console.log(name, email, password);
     const response = await fetch(`${host}/api/auth/createcustomer`, {
       method: 'POST',
       headers: {

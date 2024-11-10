@@ -6,7 +6,7 @@ import { useNavigate } from 'react-router-dom';
 function CompanyAccount() {
   const gcontext = useContext(globalContext);
   const { member, memberLogout } = gcontext;
-  console.log(member);
+  // console.log(member);
   const navigate = useNavigate();
   return (
     <div className="flex mt-32 justify-center bg-gray-100 ">
@@ -56,7 +56,8 @@ function CompanyAccount() {
         </div>
         <hr className="my-4" />
         <div className="flex justify-between mt-4">
-          <button
+          {/* Delete account button will be added later */}
+          {/* <button
             type="button"
             className="py-2 px-4 text-sm font-medium text-white bg-red-600 rounded-full hover:bg-red-700 focus:outline-none focus:ring-4 focus:ring-red-300"
             onClick={() => {
@@ -66,7 +67,7 @@ function CompanyAccount() {
             }}
           >
             Delete Account
-          </button>
+          </button> */}
 
           <button
             type="button"

@@ -1,5 +1,5 @@
 import React, { useContext, useState } from 'react';
-import { X, Package, Truck, CheckCircle } from 'lucide-react';
+import { X } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import globalContext from '../context/global/globalContext';
 import { packageContext } from '../context/packages/packageContext';
@@ -11,11 +11,12 @@ const generateTrackingId = () => {
 };
 
 const CustomerPortal = () => {
+  document.title = 'ParcelPro | Customer';
   const navigate = useNavigate();
   const gcontext = useContext(globalContext);
   const pContext = useContext(packageContext);
   const { customer, customerLogout, notify } = gcontext;
-  const { addPackage, fetchPackages, packages, setPackages } = pContext;
+  const { addPackage, fetchPackages, packages } = pContext;
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
 
@@ -156,8 +157,8 @@ const CustomerPortal = () => {
 
     // Total cost calculation
     const cost = baseCost + serviceCost;
-    const tax = cost * 0.18;
-    const totalCost = cost + tax; // 18% GST
+    const tax = (cost * 0.18).toFixed(2);
+    const totalCost = (parseFloat(cost) + parseFloat(tax)).toFixed(2); // 18% GST
     setFormData({
       ...formData,
       totalCost,
@@ -242,7 +243,7 @@ const CustomerPortal = () => {
         cost: formData.totalCost,
         status: 'pending',
       };
-      console.log('Form submitted:', data);
+      // console.log('Form submitted:', data);
       addPackage(data);
       closeModal();
     } else {
@@ -345,7 +346,7 @@ const CustomerPortal = () => {
       </div>
       <div className="flex  justify-center space-x-2">
         <button
-          className="py-2 px-4 max-w-96 w-full text-base font-semibold text-white bg-indigo-600 rounded-full hover:bg-indigo-700 focus:outline-none focus:ring-4 focus:ring-indigo-300"
+          className="py-1 px-4 max-w-96 w-full text-base font-semibold text-white bg-indigo-600 rounded-full hover:bg-indigo-700 focus:outline-none focus:ring-4 focus:ring-indigo-300"
           onClick={openModal}
         >
           Request Courier

@@ -1,10 +1,9 @@
-import React, { useState, useContext, useEffect } from 'react';
+import React, { useState, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import globalContext from '../context/global/globalContext';
 import { packageContext } from '../context/packages/packageContext';
 import PackageModal from './PackageModal';
 import StatusBadge from './StatusBadge';
-import { Save } from 'lucide-react';
 import PackageInfoCards from './PackageInfoCards';
 
 function DeliveryAgent() {
@@ -12,12 +11,10 @@ function DeliveryAgent() {
   const navigate = useNavigate();
   const gcontext = useContext(globalContext);
   const pContext = useContext(packageContext);
-  const { customer, member, customerLogout, notify } = gcontext;
+  const { member, notify } = gcontext;
   const {
-    addPackage,
     fetchPackages,
     packages,
-    setPackages,
     addJob,
     updateJob,
     getPackage,
@@ -47,7 +44,6 @@ function DeliveryAgent() {
   };
 
   const [formData, setFormData] = useState(initialFormState);
-  const [otp, setOtp] = useState('');
   const handleChange = e => {
     const { name, value, type, checked } = e.target;
     setFormData(prevData => ({
@@ -58,7 +54,7 @@ function DeliveryAgent() {
 
   const handleSubmit = e => {
     e.preventDefault();
-    console.log('Form Data:', formData);
+    // console.log('Form Data:', formData);
     if (!formData.deliveryFailed) {
       updateJob({ deliveryFailed: formData.deliveryFailed, otp: formData.otp });
     }

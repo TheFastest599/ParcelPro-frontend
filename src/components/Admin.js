@@ -1,19 +1,38 @@
-import React, { useState, useContext, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useContext } from 'react';
 import globalContext from '../context/global/globalContext';
 import { packageContext } from '../context/packages/packageContext';
-import PackageModal from './PackageModal';
-import StatusBadge from './StatusBadge';
 import PackageInfoCards from './PackageInfoCards';
+import MembersCards from './MembersCards';
 
 function Admin() {
   document.title = 'ParcelPro | Admin';
-  const navigate = useNavigate();
   const gcontext = useContext(globalContext);
   const pContext = useContext(packageContext);
-  const { customer, customerLogout, notify } = gcontext;
-  const { addPackage, fetchPackages, packages, setPackages } = pContext;
+  const { notify, member, setSpinner, host } = gcontext;
+  const { fetchPackages, packages } = pContext;
 
+  const [mode, setMode] = useState('');
+  const [memberDetails, setMemberDetails] = useState([]);
+  // Fetcching member details
+  const fetchMembers = async () => {
+    setSpinner(true);
+    const response = await fetch(`${host}/api/auth/getmembers`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'auth-token': member.token,
+      },
+    });
+    setSpinner(false);
+    const data = await response.json();
+    if (response.status === 200) {
+      notify('Members fetched successfully', 'success');
+      setMemberDetails(data);
+      // console.log(data);
+    } else {
+      notify(data.error, 'error');
+    }
+  };
   return (
     <>
       {' '}
@@ -22,12 +41,25 @@ function Admin() {
           className="py-2 px-4 max-w-64 w-full text-base font-semibold text-white bg-indigo-600 rounded-full hover:bg-indigo-700 focus:outline-none focus:ring-4 focus:ring-indigo-300"
           onClick={() => {
             fetchPackages('member', 'admin');
+            setMode('fetch packages');
           }}
         >
           Fetch Packages
         </button>
+        <button
+          className="py-2 px-4 max-w-64 w-full text-base font-semibold text-white bg-indigo-600 rounded-full hover:bg-indigo-700 focus:outline-none focus:ring-4 focus:ring-indigo-300"
+          onClick={() => {
+            fetchMembers();
+            setMode('fetch members');
+          }}
+        >
+          Member Details{' '}
+        </button>
       </div>
-      <PackageInfoCards packages={packages} />
+      {mode === 'fetch packages' && <PackageInfoCards packages={packages} />}
+      {mode === 'fetch members' && (
+        <MembersCards memberDetails={memberDetails} />
+      )}
     </>
   );
 }

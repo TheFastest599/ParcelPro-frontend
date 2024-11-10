@@ -1,13 +1,14 @@
 import React, { useContext, useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import globalContext from '../context/global/globalContext';
 import { Eye, EyeOff } from 'lucide-react';
-import { Link } from 'react-router-dom';
 
-function CompanySignUp() {
-  document.title = 'ParcelPro | Company Sign Up';
+function ResetPassword({ type }) {
+  document.title = `ParcelPro | ${type} Sign Up`;
+  const { token } = useParams();
+  // console.log(token);
   const gcontext = useContext(globalContext);
-  const { notify, setSpinner, isMemberLoggedIn, setMember, host } = gcontext;
+  const { notify, setSpinner, isMemberLoggedIn, host } = gcontext;
 
   let navigate = useNavigate();
 
@@ -19,16 +20,11 @@ function CompanySignUp() {
   }, [isMemberLoggedIn]);
 
   const [credentials, setCredentials] = useState({
-    name: '',
-    email: '',
     password: '',
     cpassword: '',
-    memberType: 'admin', // Default member type
   });
 
   const [check, setCheck] = useState({
-    name: false,
-    email: false,
     password: false,
     cpassword: false,
   });
@@ -46,55 +42,37 @@ function CompanySignUp() {
 
   const passRegex =
     /^(?=.*[A-Za-z])(?=.*\d)(?=.*[!@#$%^&*()_+\-={};':"\\|,.<>?])[A-Za-z\d!@#$%^&*()_+\-={};':"\\|,.<>?]{6,}$/;
-  const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-
-  if (isMemberLoggedIn) {
-    navigate('/company');
-  }
 
   const handleSubmit = async e => {
-    const { name, email, password, memberType } = credentials;
+    const { password } = credentials;
     e.preventDefault();
     setSpinner(true);
-    // console.log(name, email, password, memberType);
-    const response = await fetch(`${host}/api/auth/createmember`, {
+    // console.log(password);
+    let temp;
+    if (type === 'Customer') {
+      temp = 'userresetpassword';
+    } else if (type === 'Company') {
+      temp = 'memberresetpassword';
+    }
+    const response = await fetch(`${host}/api/auth/${temp}`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        name,
-        email,
         password,
-        memberType,
+        token,
       }),
     });
     setSpinner(false);
 
     const json = await response.json();
-    if (json.success) {
+    if (response.status === 200) {
       // console.log(json);
-      const data = {
-        name: json.name,
-        email: json.email,
-        memberType: json.memberType,
-        engaged: json.engaged,
-        packageId: json.packageId,
-        token: json.authToken,
-      };
-      localStorage.setItem('Member', JSON.stringify(data));
-      // localStorage.setItem('token', json.authToken);
-      // localStorage.setItem('name', json.name);
-      // localStorage.setItem('email', json.email);
-      setMember(data);
-      notify('Account Created Successfully', 'success');
-      navigate('/company');
+      notify(json.message, 'success');
+      navigate(`/${type.toLowerCase()}/login`);
     } else {
-      if (json.error) {
-        notify(json.error, 'error');
-      } else {
-        notify('Invalid credentials', 'error');
-      }
+      notify(json.error, 'error');
     }
   };
 
@@ -111,82 +89,13 @@ function CompanySignUp() {
   };
 
   return (
-    <div className="flex justify-center my-4">
+    <div className="flex justify-center mt-16">
       <div className="w-full max-w-md">
         <div className="bg-white shadow-lg rounded-lg">
           <div className="p-5">
             <form className="mb-3" onSubmit={handleSubmit}>
               <div className="text-4xl mb-5 font-semibold text-center">
-                Company Sign Up
-              </div>
-              <div className="mb-3">
-                <label
-                  htmlFor="name"
-                  className="block text-sm font-medium text-gray-700"
-                >
-                  Full Name
-                </label>
-                <input
-                  type="text"
-                  className={`mt-1 block w-full px-3 py-2 border ${
-                    check.name ? 'border-green-500' : 'border-gray-300'
-                  } rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm`}
-                  name="name"
-                  id="name"
-                  onChange={e => {
-                    onChange(e);
-                    if (e.target.value.length >= 3) {
-                      setCheck({ ...check, name: true });
-                    } else {
-                      setCheck({ ...check, name: false });
-                    }
-                  }}
-                  placeholder="Enter your full name"
-                />
-              </div>
-              <div className="mb-3">
-                <label
-                  htmlFor="email"
-                  className="block text-sm font-medium text-gray-700"
-                >
-                  Email address
-                </label>
-                <input
-                  type="email"
-                  className={`mt-1 block w-full px-3 py-2 border ${
-                    check.email ? 'border-green-500' : 'border-gray-300'
-                  } rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm`}
-                  name="email"
-                  id="email"
-                  onChange={e => {
-                    onChange(e);
-                    if (emailRegex.test(e.target.value)) {
-                      setCheck({ ...check, email: true });
-                    } else {
-                      setCheck({ ...check, email: false });
-                    }
-                  }}
-                  placeholder="name@example.com"
-                />
-              </div>
-              <div className="mb-3">
-                <label
-                  htmlFor="memberType"
-                  className="block text-sm font-medium text-gray-700"
-                >
-                  Member Type
-                </label>
-                <select
-                  name="memberType"
-                  id="memberType"
-                  className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                  value={credentials.memberType}
-                  onChange={onChange}
-                >
-                  <option value="admin">Admin</option>
-                  <option value="driver">Driver</option>
-                  <option value="delivery partner">Delivery Partner</option>
-                </select>
+                Reset Password
               </div>
               <div className="mb-3">
                 <label
@@ -289,31 +198,12 @@ function CompanySignUp() {
                   className="w-full py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
                   id="signupBtn"
                   type="submit"
-                  disabled={
-                    check.name &&
-                    check.email &&
-                    check.password &&
-                    check.cpassword
-                      ? false
-                      : true
-                  }
+                  disabled={check.password && check.cpassword ? false : true}
                 >
-                  Sign Up
+                  Submit
                 </button>
               </div>
             </form>
-            <br />
-            <div>
-              <p className="text-center text-sm">
-                Already have an account?&nbsp; &nbsp;|&nbsp; &nbsp;
-                <Link
-                  to="/company/login"
-                  className="font-bold text-indigo-600 hover:text-indigo-500"
-                >
-                  Login
-                </Link>
-              </p>
-            </div>
           </div>
         </div>
       </div>
@@ -321,4 +211,4 @@ function CompanySignUp() {
   );
 }
 
-export default CompanySignUp;
+export default ResetPassword;

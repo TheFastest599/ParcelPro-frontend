@@ -7,13 +7,14 @@ import { Link } from 'react-router-dom';
 function CompanyLogin() {
   document.title = 'ParcelPro | Company Login';
   const gcontext = useContext(globalContext);
-  const { notify, setSpinner, isMemberLoggedIn, setMember } = gcontext;
+  const { notify, setSpinner, isMemberLoggedIn, setMember, host } = gcontext;
   let navigate = useNavigate();
 
   useEffect(() => {
     if (isMemberLoggedIn) {
       navigate('/company');
     }
+    // eslint-disable-next-line
   }, [isMemberLoggedIn]);
   const [credentials, setCredentials] = useState({
     email: '',
@@ -22,13 +23,11 @@ function CompanyLogin() {
   });
   const [showPassword, setShowPassword] = useState(false);
 
-  const host = process.env.REACT_APP_PARCELPRO_HOST;
-
   const handleSubmit = async e => {
     e.preventDefault();
     const { email, password, memberType } = credentials;
     setSpinner(true);
-    console.log(email, password, memberType);
+    // console.log(email, password, memberType);
     const response = await fetch(`${host}/api/auth/memberlogin`, {
       method: 'POST',
       headers: {
@@ -52,7 +51,7 @@ function CompanyLogin() {
         packageId: json.packageId,
         token: json.authToken,
       };
-      console.log(data);
+      // console.log(data);
       localStorage.setItem('Member', JSON.stringify(data));
       setMember(data);
       notify('Logged In Successfully', 'success');
@@ -146,7 +145,7 @@ function CompanyLogin() {
                 <p className="text-sm">
                   <Link
                     className="text-indigo-600 hover:text-indigo-500"
-                    to="/forgot_password"
+                    to="/company/forgot_password"
                   >
                     Forgot password?
                   </Link>

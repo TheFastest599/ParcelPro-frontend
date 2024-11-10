@@ -1,42 +1,29 @@
 import React, { useState, useContext, useEffect } from 'react';
 import { packageContext } from '../context/packages/packageContext';
-import globalContext from '../context/global/globalContext';
-import { useSearchParams, useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import StatusBadge from './StatusBadge';
 import { Search, Link } from 'lucide-react';
 
 function TrackingPortal() {
+  document.title = 'ParcelPro | Track';
   const [trackingId, setTrackingId] = useState('');
-  const [searchParams] = useSearchParams();
   const navigate = useNavigate();
-  const trackID = searchParams.get('trackid');
+  const { trackID } = useParams();
   useEffect(() => {
     if (trackID) {
       setTrackingId(trackID);
       track(trackID);
     }
+    // eslint-disable-next-line
   }, [trackID]);
 
-  const gcontext = useContext(globalContext);
-  const { notify } = gcontext;
   const pContext = useContext(packageContext);
-  const { track, packageDetails, trackpage } = pContext;
+  const { track, packageDetails, trackpage, copyTrackingLinkToClipboard } =
+    pContext;
   const handleSubmit = e => {
     e.preventDefault();
     track(trackingId);
     navigate('/track');
-  };
-
-  const copyTrackingLinkToClipboard = async trackID => {
-    const hostAddress = window.location.host;
-    const trackingLink = `${hostAddress}/track?trackid=${trackID}`;
-
-    try {
-      await navigator.clipboard.writeText(trackingLink);
-      notify('Tracking link copied to clipboard', 'success');
-    } catch (err) {
-      console.error('Failed to copy: ', err);
-    }
   };
 
   return (
@@ -193,9 +180,11 @@ function TrackingPortal() {
                     {packageDetails.transit?.reachedDest ? 'Yes' : 'No'}
                   </p>
                   <div className="max-h-48 overflow-y-auto">
-                    <p className="px-2 font-semibold bg-blue-300 shadow-md rounded-lg border border-gray-300 mb-2">
-                      End
-                    </p>
+                    {packageDetails.transit?.reachedDest && (
+                      <p className="px-2 font-semibold bg-blue-300 shadow-md rounded-lg border border-gray-300 mb-2">
+                        End
+                      </p>
+                    )}
                     {packageDetails.transit?.status
                       .slice()
                       .reverse()
@@ -207,12 +196,14 @@ function TrackingPortal() {
                           <div className="grid grid-cols-2 gap-2 mb-2">
                             <p className=" font-semibold">{status.location}</p>
                             <p className="text-gray-500 text-sm text-right">
-                              {new Intl.DateTimeFormat('en-GB', {
+                              {new Date(status.date).toLocaleString('en-GB', {
                                 day: '2-digit',
                                 month: '2-digit',
                                 year: 'numeric',
-                              }).format(new Date(status.date))}
-                              , {new Date(status.date).toLocaleTimeString()}
+                                hour: '2-digit',
+                                minute: '2-digit',
+                                hour12: true,
+                              })}
                             </p>
                           </div>
                           <p className="text-gray-600">{status.description}</p>
@@ -235,19 +226,23 @@ function TrackingPortal() {
                     <strong>Delivery Partner:</strong>{' '}
                     {packageDetails.delivery?.deliveryPartnerName}
                   </p>
-                  <p>
-                    <strong>Date:</strong>{' '}
-                    {new Intl.DateTimeFormat('en-GB', {
-                      day: '2-digit',
-                      month: '2-digit',
-                      year: 'numeric',
-                    }).format(new Date(packageDetails.delivery?.date))}
-                    ,{' '}
-                    {new Date(
-                      packageDetails.delivery?.date
-                    ).toLocaleTimeString()}
-                  </p>
-                  {!packageDetails.delivery?.delivered && (
+                  {packageDetails.delivery?.delivered && (
+                    <p>
+                      <strong>Date:</strong>{' '}
+                      {new Date(packageDetails.delivery?.date).toLocaleString(
+                        'en-GB',
+                        {
+                          day: '2-digit',
+                          month: '2-digit',
+                          year: 'numeric',
+                          hour: '2-digit',
+                          minute: '2-digit',
+                          hour12: true,
+                        }
+                      )}
+                    </p>
+                  )}
+                  {packageDetails.delivery?.failed.deliveryFailed && (
                     <>
                       <h3 className="text-xl font-semibold mt-4">
                         Failed Delivery
@@ -275,12 +270,14 @@ function TrackingPortal() {
                   <strong>Date:</strong>{' '}
                   {packageDetails.date ? (
                     <>
-                      {new Intl.DateTimeFormat('en-GB', {
+                      {new Date(packageDetails.date).toLocaleString('en-GB', {
                         day: '2-digit',
                         month: '2-digit',
                         year: 'numeric',
-                      }).format(new Date(packageDetails.date))}
-                      , {new Date(packageDetails.date).toLocaleTimeString()}
+                        hour: '2-digit',
+                        minute: '2-digit',
+                        hour12: true,
+                      })}
                     </>
                   ) : (
                     'N/A'
@@ -290,15 +287,17 @@ function TrackingPortal() {
                   <strong>Last Updated:</strong>{' '}
                   {packageDetails.lastUpdated ? (
                     <>
-                      {new Intl.DateTimeFormat('en-GB', {
-                        day: '2-digit',
-                        month: '2-digit',
-                        year: 'numeric',
-                      }).format(new Date(packageDetails.lastUpdated))}
-                      ,{' '}
-                      {new Date(
-                        packageDetails.lastUpdated
-                      ).toLocaleTimeString()}
+                      {new Date(packageDetails.lastUpdated).toLocaleString(
+                        'en-GB',
+                        {
+                          day: '2-digit',
+                          month: '2-digit',
+                          year: 'numeric',
+                          hour: '2-digit',
+                          minute: '2-digit',
+                          hour12: true,
+                        }
+                      )}
                     </>
                   ) : (
                     'N/A'

@@ -1,26 +1,18 @@
 import React, { useContext } from 'react';
 import StatusBadge from './StatusBadge';
 import globalContext from '../context/global/globalContext';
+import { packageContext } from '../context/packages/packageContext';
 import { Link } from 'lucide-react';
 
 const PackageModal = ({ pkg, onClose }) => {
   const gcontext = useContext(globalContext);
-  const { member, notify } = gcontext;
+  const pcontext = useContext(packageContext);
+  const { member } = gcontext;
+  const { copyTrackingLinkToClipboard } = pcontext;
   const adminCheck = member && member.memberType === 'admin';
-  console.log(pkg);
-  console.log('adminCheck', adminCheck);
+  // console.log(pkg);
+  // console.log('adminCheck', adminCheck);
 
-  const copyTrackingLinkToClipboard = async trackID => {
-    const hostAddress = window.location.host;
-    const trackingLink = `${hostAddress}/track?trackid=${trackID}`;
-
-    try {
-      await navigator.clipboard.writeText(trackingLink);
-      notify('Tracking link copied to clipboard', 'success');
-    } catch (err) {
-      console.error('Failed to copy: ', err);
-    }
-  };
   return (
     <div className="fixed inset-0 flex items-center justify-center z-50">
       <div
@@ -155,9 +147,11 @@ const PackageModal = ({ pkg, onClose }) => {
                 {pkg.transit.reachedDest ? 'Yes' : 'No'}
               </p>
               <div className="max-h-48 overflow-y-auto">
-                <p className="px-2 font-semibold bg-blue-300 shadow-md rounded-lg border border-gray-300 mb-2">
-                  End
-                </p>
+                {pkg.transit.reachedDest && (
+                  <p className="px-2 font-semibold bg-blue-300 shadow-md rounded-lg border border-gray-300 mb-2">
+                    End
+                  </p>
+                )}
                 {pkg.transit.status
                   .slice()
                   .reverse()
@@ -169,12 +163,14 @@ const PackageModal = ({ pkg, onClose }) => {
                       <div className="grid grid-cols-2 gap-2 mb-2">
                         <p className=" font-semibold">{status.location}</p>
                         <p className="text-gray-500 text-sm text-right">
-                          {new Intl.DateTimeFormat('en-GB', {
+                          {new Date(status.date).toLocaleString('en-GB', {
                             day: '2-digit',
                             month: '2-digit',
                             year: 'numeric',
-                          }).format(new Date(status.date))}
-                          , {new Date(status.date).toLocaleTimeString()}
+                            hour: '2-digit',
+                            minute: '2-digit',
+                            hour12: true,
+                          })}
                         </p>
                       </div>
                       <p className="text-gray-600">{status.description}</p>
@@ -203,16 +199,20 @@ const PackageModal = ({ pkg, onClose }) => {
                 <strong>Delivery Partner:</strong>{' '}
                 {pkg.delivery.deliveryPartnerName}
               </p>
-              <p>
-                <strong>Date:</strong>{' '}
-                {new Intl.DateTimeFormat('en-GB', {
-                  day: '2-digit',
-                  month: '2-digit',
-                  year: 'numeric',
-                }).format(new Date(pkg.delivery.date))}
-                , {new Date(pkg.delivery.date).toLocaleTimeString()}
-              </p>
-              {!pkg.delivery.delivered && (
+              {pkg.delivery.delivered && (
+                <p>
+                  <strong>Date:</strong>{' '}
+                  {new Date(pkg.delivery.date).toLocaleString('en-GB', {
+                    day: '2-digit',
+                    month: '2-digit',
+                    year: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    hour12: true,
+                  })}
+                </p>
+              )}
+              {pkg.delivery.failed.deliveryFailed && (
                 <>
                   <h3 className="text-xl font-semibold mt-4">
                     Failed Delivery
@@ -236,21 +236,25 @@ const PackageModal = ({ pkg, onClose }) => {
           <div className="mb-4 md:col-span-2">
             <p>
               <strong>Date:</strong>{' '}
-              {new Intl.DateTimeFormat('en-GB', {
+              {new Date(pkg.date).toLocaleString('en-GB', {
                 day: '2-digit',
                 month: '2-digit',
                 year: 'numeric',
-              }).format(new Date(pkg.date))}
-              , {new Date(pkg.date).toLocaleTimeString()}
+                hour: '2-digit',
+                minute: '2-digit',
+                hour12: true,
+              })}
             </p>
             <p>
               <strong>Last Updated:</strong>{' '}
-              {new Intl.DateTimeFormat('en-GB', {
+              {new Date(pkg.lastUpdated).toLocaleString('en-GB', {
                 day: '2-digit',
                 month: '2-digit',
                 year: 'numeric',
-              }).format(new Date(pkg.lastUpdated))}
-              , {new Date(pkg.lastUpdated).toLocaleTimeString()}
+                hour: '2-digit',
+                minute: '2-digit',
+                hour12: true,
+              })}
             </p>
           </div>
         </div>

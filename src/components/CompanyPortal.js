@@ -55,15 +55,13 @@ function CompanyPortal({ requests, setRequests }) {
           </button>
         </div>
       </div>
-      <div className="container mx-auto my-2 lg:px-6">
-        <PackageState>
-          <Suspense fallback={<div>Loading...</div>}>
-            {member.memberType === 'admin' && <Admin />}
-            {member.memberType === 'driver' && <Driver />}
-            {member.memberType === 'delivery partner' && <DeliveryAgent />}
-          </Suspense>
-        </PackageState>
-      </div>
+      <PackageState>
+        <Suspense fallback={<div>Loading...</div>}>
+          {member.memberType === 'admin' && <Admin />}
+          {member.memberType === 'driver' && <Driver />}
+          {member.memberType === 'delivery partner' && <DeliveryAgent />}
+        </Suspense>
+      </PackageState>
     </>
   );
 }

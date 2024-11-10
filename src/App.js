@@ -1,4 +1,5 @@
-import React, { useContext, useState } from 'react';
+import React, { useContext, useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 import './App.css';
 import './output.css';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
@@ -14,23 +15,26 @@ import CustomerAccount from './components/CustomerAccount';
 import CompanyLogin from './components/CompanyLogin';
 import CompanySignUp from './components/CompanySignUp';
 import CompanyAccount from './components/CompanyAccount';
+import ForgotPassword from './components/ForgotPassword';
+import ResetPassword from './components/ResetPassword';
+import Footer from './components/Footer';
 import globalContext from './context/global/globalContext';
-
 import { PackageState } from './context/packages/packageContext';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
 // Main App Component
 export default function App() {
-  const [requests, setRequests] = useState([]);
   const gcontext = useContext(globalContext);
-  const { isSticky, isMenuOpen } = gcontext;
+  const { isPhone } = gcontext;
+  document.title = 'ParcelPro';
   return (
     <Router>
+      <PageInfo />
       <Spinner />
       <ToastContainer
-        position="bottom-right"
-        autoClose={3000}
+        position={isPhone() ? 'bottom-right' : 'top-right'}
+        autoClose={4000}
         hideProgressBar
         newestOnTop={false}
         closeOnClick
@@ -41,41 +45,31 @@ export default function App() {
         theme="light"
       />
       <div className="min-h-screen bg-gray-100 font-poppins">
-        <header
-          className={`bg-white ${
-            isSticky || isMenuOpen
-              ? 'sticky top-0 transition-transform transform translate-y-0'
-              : 'transition-transform transform -translate-y-full'
-          }`}
-        >
-          {/* Navbar */}
-          <Navbar />
-        </header>
-
+        <Navbar />
         <main className="container  mx-auto px-4  ">
           <Routes>
             <Route
               path="/customer"
               element={
                 <PackageState>
-                  <CustomerPortal
-                    requests={requests}
-                    setRequests={setRequests}
-                  />
+                  <CustomerPortal />
                 </PackageState>
               }
             />
+            <Route path="/company" element={<CompanyPortal />} />
             <Route
-              path="/company"
+              path="/track/:trackID"
               element={
-                <CompanyPortal requests={requests} setRequests={setRequests} />
+                <PackageState>
+                  <TrackingPortal />
+                </PackageState>
               }
             />
             <Route
               path="/track"
               element={
                 <PackageState>
-                  <TrackingPortal requests={requests} />
+                  <TrackingPortal />
                 </PackageState>
               }
             />
@@ -83,20 +77,55 @@ export default function App() {
             <Route path="/customer/login" element={<CustomerLogin />} />
             <Route path="/customer/signup" element={<CustomerSignUp />} />
             <Route path="/customer/account" element={<CustomerAccount />} />
+            <Route
+              path="/customer/forgot_password"
+              element={<ForgotPassword type={'Customer'} />}
+            />
+            <Route
+              path="/customer/reset_password/:token"
+              element={<ResetPassword type={'Customer'} />}
+            />
             <Route path="/company/login" element={<CompanyLogin />} />
             <Route path="/company/signup" element={<CompanySignUp />} />
             <Route path="/company/account" element={<CompanyAccount />} />
+            <Route
+              path="/company/forgot_password"
+              element={<ForgotPassword type={'Company'} />}
+            />
+            <Route
+              path="/company/reset_password/:token"
+              element={<ResetPassword type={'Company'} />}
+            />
           </Routes>
         </main>
       </div>
-      <footer className="bg-gray-800 text-white py-4 w-full">
-        <div className="container mx-auto px-4 text-center">
-          <p>&copy; 2024 ParcelPro. All rights reserved.</p>
-        </div>
-      </footer>
+      <Footer />
     </Router>
   );
 }
+
+const PageInfo = () => {
+  const gcontext = useContext(globalContext);
+  const { setPage } = gcontext;
+  const location = useLocation();
+
+  useEffect(() => {
+    // Set the page state based on the current path
+    const path = location.pathname;
+    if (path === '/') {
+      setPage('home');
+    } else if (path.startsWith('/customer')) {
+      setPage('customer');
+    } else if (path.startsWith('/company')) {
+      setPage('company');
+    } else if (path.startsWith('/track')) {
+      setPage('track');
+    } else {
+      setPage('other');
+    }
+    // eslint-disable-next-line
+  }, [location]);
+};
 
 // Home Component
 

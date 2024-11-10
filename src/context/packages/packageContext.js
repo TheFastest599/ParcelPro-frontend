@@ -7,17 +7,17 @@ const packageContext = createContext();
 const PackageState = ({ children }) => {
   const gcontext = useContext(globalContext);
   const {
+    host,
     notify,
     setSpinner,
-    isCustomerLoggedIn,
-    setCustomer,
+    // isCustomerLoggedIn,
+    // setCustomer,
     customer,
     member,
     setMember,
   } = gcontext;
 
   let navigate = useNavigate();
-  const host = process.env.REACT_APP_PARCELPRO_HOST;
 
   const [packages, setPackages] = useState([]);
   const [packageDetails, setPackageDetails] = useState();
@@ -34,7 +34,7 @@ const PackageState = ({ children }) => {
       body: JSON.stringify(data),
     });
     setSpinner(false);
-    const json = await response.json();
+    // const json = await response.json();
     // console.log(json);
     if (response.status === 200) {
       notify('Package added successfully', 'success');
@@ -158,7 +158,7 @@ const PackageState = ({ children }) => {
       if (json.driverReleived) {
         member.engaged = json.member.engaged;
         delete member.packageId;
-        setMember(member);
+        setMember(mem => ({ ...member }));
         localStorage.setItem('Member', JSON.stringify(member));
         notify(`${member.memberType} releived from job`, 'info');
       }
@@ -192,6 +192,19 @@ const PackageState = ({ children }) => {
     }
   };
 
+  // Copy tracking link to clipboard
+  const copyTrackingLinkToClipboard = async trackID => {
+    const hostAddress = window.location.host;
+    const trackingLink = `${hostAddress}/track/${trackID}`;
+
+    try {
+      await navigator.clipboard.writeText(trackingLink);
+      notify('Tracking link copied to clipboard', 'success');
+    } catch (err) {
+      // console.error('Failed to copy: ', err);
+    }
+  };
+
   return (
     <packageContext.Provider
       value={{
@@ -205,6 +218,7 @@ const PackageState = ({ children }) => {
         track,
         trackpage,
         packageDetails,
+        copyTrackingLinkToClipboard,
       }}
     >
       {children}

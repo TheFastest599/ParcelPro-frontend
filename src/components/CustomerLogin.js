@@ -6,11 +6,11 @@ import { Eye, EyeOff } from 'lucide-react';
 function CustomerLogin() {
   document.title = 'ParcelPro | Customer Login';
   const gcontext = useContext(globalContext);
-  const { notify, setSpinner, isCustomerLoggedIn, setCustomer } = gcontext;
+  const { notify, setSpinner, isCustomerLoggedIn, setCustomer, host } =
+    gcontext;
   const [credentials, setCredentials] = useState({ email: '', password: '' });
   const [showPassword, setShowPassword] = useState(false);
   let navigate = useNavigate();
-  const host = process.env.REACT_APP_PARCELPRO_HOST;
 
   if (isCustomerLoggedIn) {
     navigate('/customer');
@@ -113,7 +113,7 @@ function CustomerLogin() {
                 <p className="text-sm">
                   <Link
                     className="text-indigo-600 hover:text-indigo-500"
-                    to="/forgot_password"
+                    to="/customer/forgot_password"
                   >
                     Forgot password?
                   </Link>

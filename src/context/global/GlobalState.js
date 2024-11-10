@@ -5,6 +5,7 @@ import { toast } from 'react-toastify';
 
 const GlobalState = props => {
   // Alert----------------------------
+  const host = process.env.REACT_APP_PARCELPRO_HOST;
 
   const isPhone = () => {
     const userAgent = navigator.userAgent || navigator.vendor || window.opera;
@@ -93,11 +94,20 @@ const GlobalState = props => {
 
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
+  const [page, setPage] = useState('');
+
+  useEffect(() => {
+    console.log(page);
+  }, [page]);
+
   return (
     <GlobalContext.Provider
       value={{
+        host,
         isMenuOpen,
         setIsMenuOpen,
+        page,
+        setPage,
         isSticky,
         customer,
         setCustomer,

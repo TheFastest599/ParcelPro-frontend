@@ -1,14 +1,13 @@
 import React, { useState, useContext } from 'react';
 import StatusBadge from './StatusBadge';
 import PackageModal from './PackageModal';
-import globalContext from '../context/global/globalContext';
+import { packageContext } from '../context/packages/packageContext';
 import { Link } from 'lucide-react';
 function PackageInfoCards({ packages, addJob = null, title = 'Packages' }) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedPackage, setSelectedPackage] = useState(null);
-
-  const gcontext = useContext(globalContext);
-  const { notify } = gcontext;
+  const pcontext = useContext(packageContext);
+  const { copyTrackingLinkToClipboard } = pcontext;
 
   const openModal = pkg => {
     setSelectedPackage(pkg);
@@ -20,17 +19,6 @@ function PackageInfoCards({ packages, addJob = null, title = 'Packages' }) {
     setSelectedPackage(null);
   };
 
-  const copyTrackingLinkToClipboard = async trackID => {
-    const hostAddress = window.location.host;
-    const trackingLink = `${hostAddress}/track?trackid=${trackID}`;
-
-    try {
-      await navigator.clipboard.writeText(trackingLink);
-      notify('Tracking link copied to clipboard', 'success');
-    } catch (err) {
-      console.error('Failed to copy: ', err);
-    }
-  };
   return (
     <div className="container mx-auto mt-4">
       <h2 className="text-2xl font-bold mb-6 text-center">{title}</h2>
@@ -45,7 +33,7 @@ function PackageInfoCards({ packages, addJob = null, title = 'Packages' }) {
             >
               <div className="flex justify-between items-center mb-2">
                 <div className="flex  items-center">
-                  <p className="text-gray-700 font-semibold">
+                  <p className="text-gray-700 font-semibold text-sm sm:text-base">
                     <strong>Track ID:</strong> {pkg.trackID}
                   </p>
                   <Link
@@ -79,12 +67,14 @@ function PackageInfoCards({ packages, addJob = null, title = 'Packages' }) {
                     <strong>Last Updated:</strong>{' '}
                   </p>
                   <p>
-                    {new Intl.DateTimeFormat('en-GB', {
+                    {new Date(pkg.lastUpdated).toLocaleString('en-GB', {
                       day: '2-digit',
                       month: '2-digit',
                       year: 'numeric',
-                    }).format(new Date(pkg.lastUpdated))}
-                    , {new Date(pkg.lastUpdated).toLocaleTimeString()}
+                      hour: '2-digit',
+                      minute: '2-digit',
+                      hour12: true,
+                    })}
                   </p>
                 </div>
                 <div>
