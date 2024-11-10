@@ -346,13 +346,13 @@ const CustomerPortal = () => {
       </div>
       <div className="flex  justify-center space-x-2">
         <button
-          className="py-1 px-4 max-w-96 w-full text-base font-semibold text-white bg-indigo-600 rounded-full hover:bg-indigo-700 focus:outline-none focus:ring-4 focus:ring-indigo-300"
+          className="py-1 px-4 max-w-96 w-full text-sm  sm:text-base font-semibold text-white bg-indigo-600 rounded-full hover:bg-indigo-700 focus:outline-none focus:ring-4 focus:ring-indigo-300"
           onClick={openModal}
         >
           Request Courier
         </button>
         <button
-          className="py-2 px-4 max-w-64 w-full text-base font-semibold text-white bg-indigo-600 rounded-full hover:bg-indigo-700 focus:outline-none focus:ring-4 focus:ring-indigo-300"
+          className="py-2 px-4 max-w-64 w-full text-sm  sm:text-base font-semibold text-white bg-indigo-600 rounded-full hover:bg-indigo-700 focus:outline-none focus:ring-4 focus:ring-indigo-300"
           onClick={() => {
             fetchPackages('customer');
           }}

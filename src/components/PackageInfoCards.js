@@ -31,16 +31,16 @@ function PackageInfoCards({ packages, addJob = null, title = 'Packages' }) {
               key={pkg.trackID}
               className="p-6 bg-white shadow-lg rounded-lg border border-gray-200"
             >
-              <div className="flex justify-between items-center mb-2">
+              <div className="flex justify-between items-start mb-2">
                 <div className="flex  items-center">
-                  <p className="text-gray-700 font-semibold text-sm sm:text-base">
-                    <strong>Track ID:</strong> {pkg.trackID}
-                  </p>
+                  <div className="text-gray-700 font-semibold text-sm sm:text-base ">
+                    <strong>Track ID:</strong> <p>{pkg.trackID}</p>
+                  </div>
                   <Link
                     onClick={() => {
                       copyTrackingLinkToClipboard(pkg.trackID);
                     }}
-                    className="size-6 mx-2 bg-gray-100 rounded-md p-1 transition duration-300 ease-in-out transform hover:bg-gray-300 hover:scale-105 cursor-pointer"
+                    className="size-6 mx-4 bg-gray-100 rounded-md p-1 transition duration-300 ease-in-out transform hover:bg-gray-300 hover:scale-105 cursor-pointer"
                   />
                 </div>
                 <StatusBadge status={pkg.status} />

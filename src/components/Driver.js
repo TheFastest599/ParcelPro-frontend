@@ -1,4 +1,4 @@
-import React, { useState, useContext, useEffect } from 'react';
+import React, { useState, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import globalContext from '../context/global/globalContext';
 import { packageContext } from '../context/packages/packageContext';
@@ -12,12 +12,10 @@ function Driver() {
   const navigate = useNavigate();
   const gcontext = useContext(globalContext);
   const pContext = useContext(packageContext);
-  const { customer, member, customerLogout, notify } = gcontext;
+  const { member, notify } = gcontext;
   const {
-    addPackage,
     fetchPackages,
     packages,
-    setPackages,
     addJob,
     updateJob,
     getPackage,
@@ -60,7 +58,7 @@ function Driver() {
     // console.log(formData);
     let valiadte = formData.location && formData.description;
     if (formData.reachedDest) {
-      if (formData.location != packageDetails.receiver.cityVil) {
+      if (formData.location !== packageDetails.receiver.cityVil) {
         valiadte = false;
         notify(
           "Given location and receiver city/village  doesn't match, cannot be destination",
@@ -77,7 +75,7 @@ function Driver() {
     <>
       <div className="flex  justify-center space-x-2">
         <button
-          className={`py-2 px-4 max-w-96 w-full text-base font-semibold text-white rounded-full focus:outline-none focus:ring-4 ${
+          className={`py-2 px-4 max-w-96 w-full text-sm  sm:text-base font-semibold text-white rounded-full focus:outline-none focus:ring-4 ${
             !member.engaged
               ? 'bg-gray-400 cursor-not-allowed'
               : 'bg-indigo-600 hover:bg-indigo-700 focus:ring-indigo-300'
@@ -92,7 +90,7 @@ function Driver() {
           Update Package
         </button>
         <button
-          className={`py-2 px-4 max-w-64 w-full text-base font-semibold text-white rounded-full focus:outline-none focus:ring-4 ${
+          className={`py-2 px-4 max-w-64 w-full text-sm  sm:text-base font-semibold text-white rounded-full focus:outline-none focus:ring-4 ${
             member.engaged
               ? 'bg-gray-400 cursor-not-allowed'
               : 'bg-indigo-600 hover:bg-indigo-700 focus:ring-indigo-300'

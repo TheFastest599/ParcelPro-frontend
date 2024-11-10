@@ -75,7 +75,7 @@ function CompanyLogin() {
         <div className="bg-white shadow-lg rounded-lg pb-5 pt-2 mt-5">
           <div className="px-5 pt-4">
             <form className="mb-3 mt-4" onSubmit={handleSubmit}>
-              <div className="text-4xl mb-5 font-semibold text-center">
+              <div className="text-3xl  sm:text-4xl mb-5 font-semibold text-center">
                 Company Login
               </div>
               <div className="mb-3">

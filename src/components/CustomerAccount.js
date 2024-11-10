@@ -11,7 +11,9 @@ function CustomerAccount() {
   return (
     <div className="flex mt-32 justify-center bg-gray-100 ">
       <div className="bg-white shadow-lg rounded-lg p-8 max-w-md w-full">
-        <div className="text-4xl mb-6 font-semibold text-center ">Account</div>
+        <div className="text-3xl  sm:text-4xl mb-6 font-semibold text-center ">
+          Account
+        </div>
         <div className="mb-4">
           <div className="mb-3">
             <label
