@@ -14,7 +14,7 @@ const StatusBadge = ({ status }) => {
     switch (status) {
       case 'pending':
         return (
-          <span className="relative inline-block px-3 py-1 font-semibold text-yellow-900 leading-tight">
+          <span className="relative  inline-block px-3 py-1 font-semibold text-yellow-900 leading-tight">
             <span
               aria-hidden
               className="absolute inset-0  bg-yellow-200 opacity-50 rounded-full"

@@ -363,7 +363,7 @@ const CustomerPortal = () => {
       <hr className="my-4 border-t border-gray-300" />
       {isModalOpen && (
         <div
-          className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50"
+          className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-10"
           // onClick={e => {
           //   if (e.target === e.currentTarget) {
           //     closeModal();
