@@ -19,7 +19,7 @@ const PackageModal = ({ pkg, onClose }) => {
         className="bg-black opacity-50 absolute inset-0"
         onClick={onClose}
       ></div>
-      <div className="bg-white rounded-lg shadow-lg p-6 z-10 max-w-4xl w-full mx-4 sm:mx-6 md:mx-8 lg:mx-10 xl:mx-12 overflow-y-auto max-h-full text-sm">
+      <div className="bg-white rounded-lg shadow-lg p-6  max-w-4xl w-full mx-4 sm:mx-6 md:mx-8 lg:mx-10 xl:mx-12 overflow-y-auto max-h-full text-sm">
         <div className="flex justify-between items-center mb-2">
           <h2 className="text-xl font-bold">Package Details</h2>
           <StatusBadge status={pkg.status} />

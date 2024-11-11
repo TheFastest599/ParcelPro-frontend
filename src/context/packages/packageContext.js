@@ -195,7 +195,9 @@ const PackageState = ({ children }) => {
   // Copy tracking link to clipboard
   const copyTrackingLinkToClipboard = async trackID => {
     const hostAddress = window.location.host;
-    const trackingLink = `${hostAddress}/track/${trackID}`;
+    const trackingLink = `${
+      hostAddress.startsWith('localhost') ? 'http://' : 'https://'
+    }${hostAddress}/track/${trackID}`;
 
     try {
       await navigator.clipboard.writeText(trackingLink);
