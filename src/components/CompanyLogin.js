@@ -7,7 +7,7 @@ import { Link } from 'react-router-dom';
 function CompanyLogin() {
   document.title = 'ParcelPro | Company Login';
   const gcontext = useContext(globalContext);
-  const { notify, setSpinner, isMemberLoggedIn, setMember, host } = gcontext;
+  const { notify, setSpinner, isMemberLoggedIn, memberLogin, host } = gcontext;
   let navigate = useNavigate();
 
   useEffect(() => {
@@ -52,8 +52,7 @@ function CompanyLogin() {
         token: json.authToken,
       };
       // console.log(data);
-      localStorage.setItem('Member', JSON.stringify(data));
-      setMember(data);
+      memberLogin(data);
       notify('Logged In Successfully', 'success');
       navigate('/company');
     } else {

@@ -7,7 +7,7 @@ import { Link } from 'react-router-dom';
 function CompanySignUp() {
   document.title = 'ParcelPro | Company Sign Up';
   const gcontext = useContext(globalContext);
-  const { notify, setSpinner, isMemberLoggedIn, setMember, host } = gcontext;
+  const { notify, setSpinner, isMemberLoggedIn, memberLogin, host } = gcontext;
 
   let navigate = useNavigate();
 
@@ -82,11 +82,7 @@ function CompanySignUp() {
         packageId: json.packageId,
         token: json.authToken,
       };
-      localStorage.setItem('Member', JSON.stringify(data));
-      // localStorage.setItem('token', json.authToken);
-      // localStorage.setItem('name', json.name);
-      // localStorage.setItem('email', json.email);
-      setMember(data);
+      memberLogin(data);
       notify('Account Created Successfully', 'success');
       navigate('/company');
     } else {

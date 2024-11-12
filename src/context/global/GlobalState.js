@@ -49,9 +49,9 @@ const GlobalState = props => {
   useEffect(() => {
     const customer = JSON.parse(localStorage.getItem('Customer'));
     const member = JSON.parse(localStorage.getItem('Member'));
-    console.log(customer, member);
+    // console.log(customer, member);
     if (customer) {
-      setIsCustomerLoggedIn(true);
+      setIsCustomerLoggedIn();
       setCustomer(customer);
     }
     if (member) {
@@ -59,6 +59,24 @@ const GlobalState = props => {
       setMember(member);
     }
   }, []);
+
+  const customerLogin = data => {
+    localStorage.setItem('Customer', JSON.stringify(data));
+    setCustomer(data);
+    setIsCustomerLoggedIn(true);
+    if (isMemberLoggedIn) {
+      memberLogout();
+    }
+  };
+
+  const memberLogin = data => {
+    localStorage.setItem('Member', JSON.stringify(data));
+    setMember(data);
+    setisMemberLoggedIn(true);
+    if (isCustomerLoggedIn) {
+      customerLogout();
+    }
+  };
 
   const customerLogout = () => {
     localStorage.removeItem('Customer');
@@ -97,7 +115,7 @@ const GlobalState = props => {
   const [page, setPage] = useState('');
 
   useEffect(() => {
-    console.log(page);
+    // console.log(page);
   }, [page]);
 
   return (
@@ -121,6 +139,8 @@ const GlobalState = props => {
         spinner,
         setSpinner,
         notify,
+        customerLogin,
+        memberLogin,
         customerLogout,
         memberLogout,
       }}

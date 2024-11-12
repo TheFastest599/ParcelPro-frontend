@@ -6,7 +6,7 @@ import { Eye, EyeOff } from 'lucide-react';
 function CustomerSignUp() {
   document.title = 'ParcelPro | Customer Sign Up';
   const gcontext = useContext(globalContext);
-  const { notify, setSpinner, isCustomerLoggedIn, setCustomer, host } =
+  const { notify, setSpinner, isCustomerLoggedIn, customerLogin, host } =
     gcontext;
 
   const [credentials, setCredentials] = useState({
@@ -69,12 +69,7 @@ function CustomerSignUp() {
         email: json.email,
         token: json.authToken,
       };
-      localStorage.setItem('Customer', JSON.stringify(data));
-      // localStorage.setItem('token', json.authToken);
-      // localStorage.setItem('name', json.name);
-      // localStorage.setItem('email', json.email);
-      setCustomer(data);
-      notify('Account Created Successfully', 'success');
+      customerLogin(data);
       navigate('/customer');
     } else {
       if (json.error) {

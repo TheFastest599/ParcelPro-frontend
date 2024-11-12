@@ -34,7 +34,7 @@ export default function App() {
       <Spinner />
       <ToastContainer
         position={isPhone() ? 'bottom-right' : 'top-right'}
-        autoClose={4000}
+        autoClose={3000}
         hideProgressBar
         newestOnTop={false}
         closeOnClick

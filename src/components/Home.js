@@ -1,7 +1,7 @@
 import React, { useContext } from 'react';
 import { Link } from 'react-router-dom';
 import globalContext from '../context/global/globalContext';
-import heroImage from '../assests/image.png'; // Make sure to replace this with the actual path to your image
+import heroImage from '../assests/image.png';
 
 function Home() {
   const gcontext = useContext(globalContext);
@@ -12,7 +12,7 @@ function Home() {
         <img
           src={heroImage}
           alt="Hero"
-          className="w-full max-h-80 object-cover rounded-lg shadow-lg"
+          className="w-full min-h-20 max-h-80 object-cover rounded-lg shadow-lg"
         />
         <div className="absolute inset-0 flex flex-col items-center justify-center bg-black bg-opacity-50 rounded-lg">
           <h1 className="text-5xl sm:text-6xl font-bold text-white mb-2 drop-shadow-lg">

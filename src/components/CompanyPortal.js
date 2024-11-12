@@ -7,17 +7,7 @@ const Admin = lazy(() => import('./Admin'));
 const Driver = lazy(() => import('./Driver'));
 const DeliveryAgent = lazy(() => import('./DeliveryAgent'));
 
-function CompanyPortal({ requests, setRequests }) {
-  const handleStatusChange = (id, newStatus) => {
-    setRequests(
-      requests.map(req => (req.id === id ? { ...req, status: newStatus } : req))
-    );
-  };
-
-  const capitalize = str => {
-    if (!str) return '';
-    return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
-  };
+function CompanyPortal() {
   const gcontext = useContext(globalContext);
   const { member, memberLogout } = gcontext;
 

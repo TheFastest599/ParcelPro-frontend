@@ -6,7 +6,7 @@ import { Eye, EyeOff } from 'lucide-react';
 function CustomerLogin() {
   document.title = 'ParcelPro | Customer Login';
   const gcontext = useContext(globalContext);
-  const { notify, setSpinner, isCustomerLoggedIn, setCustomer, host } =
+  const { notify, setSpinner, isCustomerLoggedIn, customerLogin, host } =
     gcontext;
   const [credentials, setCredentials] = useState({ email: '', password: '' });
   const [showPassword, setShowPassword] = useState(false);
@@ -39,8 +39,7 @@ function CustomerLogin() {
         email: json.email,
         token: json.authToken,
       };
-      localStorage.setItem('Customer', JSON.stringify(data));
-      setCustomer(data);
+      customerLogin(data);
       notify('Logged In Successfully', 'success');
       navigate('/customer');
     } else {

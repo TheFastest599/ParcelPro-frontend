@@ -94,7 +94,7 @@ const PackageState = ({ children }) => {
     const json = await response.json();
     if (response.status === 200) {
       setPackageDetails(json.package);
-      console.log(json.package);
+      // console.log(json.package);
       notify(json.message, 'success');
     } else if (response.status === 403) {
       notify(json.message, 'warn');
@@ -153,7 +153,7 @@ const PackageState = ({ children }) => {
     const json = await response.json();
     if (response.status === 200) {
       setPackageDetails(json.package);
-      console.log(json);
+      // console.log(json);
       notify(json.message, 'success');
       if (json.driverReleived) {
         member.engaged = json.member.engaged;
@@ -184,7 +184,7 @@ const PackageState = ({ children }) => {
     if (response.status === 200) {
       setPackageDetails(json.package);
       setTrackPage(true);
-      console.log(json);
+      // console.log(json);
       notify(json.message, 'success');
     } else {
       setTrackPage(false);
